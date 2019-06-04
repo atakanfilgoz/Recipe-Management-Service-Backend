@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +22,6 @@ public class RecipeController {
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>("", HttpStatus.OK);
-
     }
 
     @GetMapping("/getRecipes")
@@ -38,13 +36,16 @@ public class RecipeController {
     //update eklenecek. putMapping datei unutma
 
     @GetMapping("/getRecipe/{tag}")
-    public ResponseEntity<String> getRecipeByTag(@PathVariable String tag){
+    public Recipe getRecipeByTag(@PathVariable String tag){
         Recipe result = recipeRepo.findByTags(tag);
         if (result == null){
+            return null;
+        }
+        return result;
+        /*if (result == null){
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>("", HttpStatus.OK);
-
+        return new ResponseEntity<>("", HttpStatus.OK);*/
     }
 
     @DeleteMapping("/deleteRecipe/{id}")
@@ -56,5 +57,24 @@ public class RecipeController {
         }
         return new ResponseEntity<>("", HttpStatus.OK);
     }
+
+    @PutMapping("/updateRecipe/{id}")
+    public ResponseEntity<String> updateRecipe(@PathVariable (value = "id") String _id, @RequestBody Recipe recipeRequest){
+        if (!recipeRepo.existsBy_id(_id)){
+            return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+        }
+        Recipe temp = recipeRepo.findBy_id(_id);
+        temp.setDetails(recipeRequest.getDetails());
+        temp.setUpdatedDate(new Date());
+        temp.setPhotos(recipeRequest.getPhotos());
+        temp.setTags(recipeRequest.getTags());
+        recipeRepo.save(temp);
+        return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+    /*@GetMapping("/searchRecipeswithTag/{tag}")
+    public Recipe searchRecipe(@PathVariable (value = "tag")  String tag){
+        return recipeRepo.findByTagsContaining(tag);
+    }*/
 
 }
