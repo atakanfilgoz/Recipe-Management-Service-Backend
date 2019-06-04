@@ -58,7 +58,7 @@ public class RecipeController {
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
-    @PutMapping("/updateRecipe/{id}")
+    /*@PutMapping("/updateRecipe/{id}")
     public ResponseEntity<String> updateRecipe(@PathVariable (value = "id") String _id, @RequestBody Recipe recipeRequest){
         if (!recipeRepo.existsBy_id(_id)){
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
@@ -70,7 +70,7 @@ public class RecipeController {
         temp.setTags(recipeRequest.getTags());
         recipeRepo.save(temp);
         return new ResponseEntity<>("", HttpStatus.OK);
-    }
+    }*/
 
     /*@GetMapping("/searchRecipeswithTag/{tag}")
     public Recipe searchRecipe(@PathVariable (value = "tag")  String tag){

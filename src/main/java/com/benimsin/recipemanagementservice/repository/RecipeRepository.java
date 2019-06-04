@@ -7,6 +7,6 @@ public interface RecipeRepository extends MongoRepository<Recipe,String> {
     Recipe findByTags(String tag);
     long deleteBy_id(String id);
     Recipe findBy_id(String id);
-    boolean existsBy_id(String id);
-    Recipe findByTagsContainingOOrDetails(String tag, String details);
+    //boolean existsBy_id(String id);
+    //Recipe findByTagsContainingOOrDetails(String tag, String details);
 }
