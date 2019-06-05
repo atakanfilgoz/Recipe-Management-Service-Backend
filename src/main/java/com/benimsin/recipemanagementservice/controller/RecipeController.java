@@ -66,6 +66,7 @@ public class RecipeController {
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
         Recipe temp = recipeRepo.findBy_id(_id);
+        temp.setName(recipeRequest.getName());
         temp.setDetails(recipeRequest.getDetails());
         temp.setUpdatedDate(new Date());
         temp.setPhotos(recipeRequest.getPhotos());

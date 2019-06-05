@@ -13,6 +13,7 @@ public class Recipe implements Serializable {
 
     @Id
     private String _id;
+    private String name;
     private String details;
     private List<Photo> photos = new ArrayList<>();
     private Date createdDate = new Date();
@@ -50,6 +51,10 @@ public class Recipe implements Serializable {
     public void setDetails(String details) {
         this.details = details;
     }
+
+    public String getName() { return name; }
+
+    public void setName(String name) { this.name = name; }
 
     public List<Photo> getPhotos() {
         return photos;
