@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -72,9 +74,16 @@ public class RecipeController {
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
-    /*@GetMapping("/searchRecipeswithTag/{tag}")
-    public Recipe searchRecipe(@PathVariable (value = "tag")  String tag){
-        return recipeRepo.findByTagsContaining(tag);
-    }*/
+    @GetMapping("/searchRecipes/{keyword}")
+    public List<Recipe> searchRecipe(@PathVariable (value = "keyword")  String keyword){
+        ArrayList<Recipe> recipes = new ArrayList<>();
+        if (recipeRepo.findByTagsContaining(keyword) != null){
+            recipes.addAll(recipeRepo.findByTagsContaining(keyword));
+        }
+        if (recipeRepo.findByDetailsContaining(keyword) != null){
+            recipes.addAll(recipeRepo.findByDetailsContaining(keyword));
+        }
+        return recipes;
+    }
 
 }
