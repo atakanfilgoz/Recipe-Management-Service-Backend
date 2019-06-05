@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -35,8 +34,6 @@ public class RecipeController {
         return new ResponseEntity<>(recipeList, HttpStatus.OK);
     }
 
-    //update eklenecek. putMapping datei unutma
-
     @GetMapping("/getRecipe/{tag}")
     public Recipe getRecipeByTag(@PathVariable String tag){
         Recipe result = recipeRepo.findByTags(tag);
@@ -48,16 +45,6 @@ public class RecipeController {
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>("", HttpStatus.OK);*/
-    }
-
-    @DeleteMapping("/deleteRecipe/{id}")
-    public ResponseEntity<String> deleteRecipeById(@PathVariable String id){
-        Recipe temp = recipeRepo.findBy_id(id);
-        long result = recipeRepo.deleteBy_id(id);
-        if (temp == null){
-            return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>("", HttpStatus.OK);
     }
 
     @PutMapping("/updateRecipe/{id}")
@@ -73,18 +60,6 @@ public class RecipeController {
         temp.setTags(recipeRequest.getTags());
         recipeRepo.save(temp);
         return new ResponseEntity<>("", HttpStatus.OK);
-    }
-
-    @GetMapping("/searchRecipes/{keyword}")
-    public List<Recipe> searchRecipe(@PathVariable (value = "keyword")  String keyword){
-        ArrayList<Recipe> recipes = new ArrayList<>();
-        if (recipeRepo.findByTagsContaining(keyword) != null){
-            recipes.addAll(recipeRepo.findByTagsContaining(keyword));
-        }
-        if (recipeRepo.findByDetailsContaining(keyword) != null){
-            recipes.addAll(recipeRepo.findByDetailsContaining(keyword));
-        }
-        return recipes;
     }
 
 }
