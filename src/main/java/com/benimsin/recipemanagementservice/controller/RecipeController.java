@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.ArrayList;
 
 @RestController
 public class RecipeController {
@@ -34,9 +35,9 @@ public class RecipeController {
         return new ResponseEntity<>(recipeList, HttpStatus.OK);
     }
 
-    @GetMapping("/getRecipe/{tag}")
-    public Recipe getRecipeByTag(@PathVariable String tag){
-        Recipe result = recipeRepo.findByTags(tag);
+    @GetMapping("/getRecipe/{id}")
+    public Recipe getRecipeByTag(@PathVariable (value = "id") String _id){
+        Recipe result = recipeRepo.findBy_id(_id);
         if (result == null){
             return null;
         }
@@ -59,6 +60,28 @@ public class RecipeController {
         temp.setPhotos(recipeRequest.getPhotos());
         temp.setTags(recipeRequest.getTags());
         recipeRepo.save(temp);
+        return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+    @GetMapping("/searchRecipes/{keyword}")
+    public List<Recipe> searchRecipe(@PathVariable (value = "keyword")  String keyword){
+        ArrayList<Recipe> recipes = new ArrayList<>();
+        if (recipeRepo.findByTagsContaining(keyword) != null){
+            recipes.addAll(recipeRepo.findByTagsContaining(keyword));
+        }
+        if (recipeRepo.findByDetailsContaining(keyword) != null){
+            recipes.addAll(recipeRepo.findByDetailsContaining(keyword));
+        }
+        return recipes;
+    }
+
+    @DeleteMapping("/deleteRecipe/{id}")
+    public ResponseEntity<String> deleteRecipeById(@PathVariable String id){
+        Recipe temp = recipeRepo.findBy_id(id);
+        long result = recipeRepo.deleteBy_id(id);
+        if (temp == null){
+            return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
+        }
         return new ResponseEntity<>("", HttpStatus.OK);
     }
 
