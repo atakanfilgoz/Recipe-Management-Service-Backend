@@ -72,7 +72,13 @@ public class RecipeController {
         if (recipeRepo.findByDetailsContaining(keyword) != null){
             recipes.addAll(recipeRepo.findByDetailsContaining(keyword));
         }
-        return recipes;
+        ArrayList<Recipe> pureList = new ArrayList<>();
+        for (Recipe recipe : recipes) {
+            if (!pureList.contains(recipe)) {
+                    pureList.add(recipe);
+            }
+        }
+        return pureList;
     }
 
     @DeleteMapping("/deleteRecipe/{id}")
@@ -83,6 +89,11 @@ public class RecipeController {
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>("", HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteAllRecipes")
+    public void deleteAllRecipes(){
+        recipeRepo.deleteAll();
     }
 
 }
