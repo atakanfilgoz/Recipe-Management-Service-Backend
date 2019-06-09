@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -66,19 +67,32 @@ public class RecipeController {
     @GetMapping("/searchRecipes/{keyword}")
     public List<Recipe> searchRecipe(@PathVariable (value = "keyword")  String keyword){
         ArrayList<Recipe> recipes = new ArrayList<>();
+        ArrayList<String> ids = new ArrayList<>();
+        boolean isDup = false;
+
         if (recipeRepo.findByTagsContaining(keyword) != null){
             recipes.addAll(recipeRepo.findByTagsContaining(keyword));
         }
-        if (recipeRepo.findByDetailsContaining(keyword) != null){
-            recipes.addAll(recipeRepo.findByDetailsContaining(keyword));
+
+        for (Recipe recipe : recipes){
+            ids.add(recipe.getId());
         }
-        ArrayList<Recipe> pureList = new ArrayList<>();
-        for (Recipe recipe : recipes) {
-            if (!pureList.contains(recipe)) {
-                    pureList.add(recipe);
+
+        if (recipeRepo.findByDetailsContaining(keyword) != null){
+            List<Recipe> containing = recipeRepo.findByDetailsContaining(keyword);
+            for (Recipe recipe : containing){
+                for (String id : ids) {
+                    if (id.equals(recipe.getId())){
+                        isDup = true;
+                    }
+                }
+                if (!isDup){
+                    recipes.add(recipe);
+                    isDup = false;
+                }
             }
         }
-        return pureList;
+        return recipes;
     }
 
     @DeleteMapping("/deleteRecipe/{id}")
