@@ -11,6 +11,7 @@ public class Photo implements Serializable {
     @Id
     private String id;
     private String photoLink;
+    private String publicCloudinaryId;
 
     public String getId() {
         return id;
@@ -26,5 +27,13 @@ public class Photo implements Serializable {
 
     public void setPhotoLink(String photoLink) {
         this.photoLink = photoLink;
+    }
+
+    public String getPublicCloudinaryId() {
+        return publicCloudinaryId;
+    }
+
+    public void setPublicCloudinaryId(String publicCloudinaryId) {
+        this.publicCloudinaryId = publicCloudinaryId;
     }
 }

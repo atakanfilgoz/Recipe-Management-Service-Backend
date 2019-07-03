@@ -1,16 +1,20 @@
 package com.benimsin.recipemanagementservice.controller;
 
+import com.benimsin.recipemanagementservice.model.Photo;
 import com.benimsin.recipemanagementservice.model.Recipe;
 import com.benimsin.recipemanagementservice.repository.RecipeRepository;
+import com.benimsin.recipemanagementservice.service.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 
 @RestController
 public class RecipeController {
@@ -18,10 +22,33 @@ public class RecipeController {
     @Autowired
     RecipeRepository recipeRepo;
 
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
     @PostMapping("/addRecipe")
-    public ResponseEntity<String> addRecipe(@RequestBody Recipe recipe){
-        Recipe tempRecipe = recipeRepo.save(recipe);
-        if (tempRecipe == null){
+    public ResponseEntity<String> addRecipe(@RequestParam("name") String name,
+                                            @RequestParam("details") String details,
+                                            @RequestParam("tags") ArrayList<String> tags,
+                                            @RequestPart("file") @Valid List<MultipartFile> files){
+        Recipe tempRecipe = new Recipe();
+        tempRecipe.setName(name);
+        tempRecipe.setDetails(details);
+        tempRecipe.setTags(tags);
+
+        if (files == null){
+            return null;
+        }
+        ArrayList<Photo> photos = new ArrayList<>();
+        for (MultipartFile mFile : files){
+            Map <String,String> photoInfo = cloudinaryService.uploadFile(mFile);
+            Photo photo = new Photo();
+            photo.setPhotoLink(photoInfo.get("url"));
+            photo.setPublicCloudinaryId(photoInfo.get("publicId"));
+            photos.add(photo);
+        }
+        tempRecipe.setPhotos(photos);
+        Recipe result = recipeRepo.save(tempRecipe);
+        if (result == null){
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
         return new ResponseEntity<>("", HttpStatus.OK);
@@ -99,6 +126,11 @@ public class RecipeController {
     public ResponseEntity<String> deleteRecipeById(@PathVariable String id){
         Recipe temp = recipeRepo.findBy_id(id);
         long result = recipeRepo.deleteBy_id(id);
+        for (Photo photo : temp.getPhotos()){
+            if (photo != null){
+                cloudinaryService.deleteFile(photo.getPublicCloudinaryId());
+            }
+        }
         if (temp == null){
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
