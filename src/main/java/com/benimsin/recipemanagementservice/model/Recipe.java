@@ -19,6 +19,7 @@ public class Recipe implements Serializable {
     private Date createdDate = new Date();
     private Date updatedDate;
     private ArrayList<String> tags = new ArrayList<>();
+    private String userName;
 
     public Date getCreatedDate() {
         return createdDate;
@@ -70,5 +71,13 @@ public class Recipe implements Serializable {
 
     public void setTags(ArrayList<String> tags) {
         this.tags = tags;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
 }

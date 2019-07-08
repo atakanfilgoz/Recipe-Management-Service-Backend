@@ -7,13 +7,14 @@ import com.benimsin.recipemanagementservice.service.CloudinaryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
 @RestController
@@ -29,12 +30,13 @@ public class RecipeController {
     public ResponseEntity<String> addRecipe(@RequestParam("name") String name,
                                             @RequestParam("details") String details,
                                             @RequestParam("tags") ArrayList<String> tags,
-                                            @RequestPart("file") @Valid List<MultipartFile> files){
+                                            @RequestPart("file") @Valid List<MultipartFile> files,
+                                            Authentication authentication){
         Recipe tempRecipe = new Recipe();
         tempRecipe.setName(name);
         tempRecipe.setDetails(details);
         tempRecipe.setTags(tags);
-
+        tempRecipe.setUserName(authentication.getName());
         if (files == null){
             return null;
         }
@@ -63,6 +65,16 @@ public class RecipeController {
         return new ResponseEntity<>(recipeList, HttpStatus.OK);
     }
 
+    @GetMapping("/getMyRecipes")
+    public ResponseEntity<List> getMyRecipes(Authentication authentication){
+        String userName = authentication.getName();
+        List<Recipe> recipeList = recipeRepo.findByUserName(userName);
+        if (recipeList == null){
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(recipeList, HttpStatus.OK);
+    }
+
     @GetMapping("/getRecipe/{id}")
     public Recipe getRecipeByTag(@PathVariable (value = "id") String _id){
         Recipe result = recipeRepo.findBy_id(_id);
@@ -77,11 +89,14 @@ public class RecipeController {
     }
 
     @PutMapping("/updateRecipe/{id}")
-    public ResponseEntity<String> updateRecipe(@PathVariable (value = "id") String _id, @RequestBody Recipe recipeRequest){
+    public ResponseEntity<String> updateRecipe(@PathVariable (value = "id") String _id, @RequestBody Recipe recipeRequest, Authentication authentication){
         if (!recipeRepo.existsBy_id(_id)){
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
         Recipe temp = recipeRepo.findBy_id(_id);
+        if (!authentication.getName().equals(temp.getUserName())){
+            return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
+        }
         temp.setName(recipeRequest.getName());
         temp.setDetails(recipeRequest.getDetails());
         temp.setUpdatedDate(new Date());
@@ -123,8 +138,11 @@ public class RecipeController {
     }
 
     @DeleteMapping("/deleteRecipe/{id}")
-    public ResponseEntity<String> deleteRecipeById(@PathVariable String id){
+    public ResponseEntity<String> deleteRecipeById(@PathVariable String id, Authentication authentication){
         Recipe temp = recipeRepo.findBy_id(id);
+        if (!authentication.getName().equals(temp.getUserName())){
+            return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
+        }
         long result = recipeRepo.deleteBy_id(id);
         for (Photo photo : temp.getPhotos()){
             if (photo != null){

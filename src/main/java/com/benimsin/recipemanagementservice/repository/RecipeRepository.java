@@ -11,4 +11,5 @@ public interface RecipeRepository extends MongoRepository<Recipe,String> {
     List<Recipe> findByTagsContaining(String tags);
     List<Recipe> findByDetailsContaining(String details);
     long deleteBy_id(String id);
+    List<Recipe> findByUserName(String userName);
 }
