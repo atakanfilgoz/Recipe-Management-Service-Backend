@@ -74,7 +74,6 @@ public class RecipeManagementServiceApplication {
                 }
             }
         }
-
     }
 
     public static long getDateDiff(Date date1, Date date2, TimeUnit timeUnit) {
