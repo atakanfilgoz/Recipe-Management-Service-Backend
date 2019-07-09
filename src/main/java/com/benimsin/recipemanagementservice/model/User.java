@@ -17,6 +17,7 @@ public class User implements Serializable {
     private String username;
     private String password;
     private String fullName;
+    private int nDays = 10;
 
     public String getId() {
         return id;
@@ -48,5 +49,13 @@ public class User implements Serializable {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public int getnDays() {
+        return nDays;
+    }
+
+    public void setnDays(int nDays) {
+        this.nDays = nDays;
     }
 }
