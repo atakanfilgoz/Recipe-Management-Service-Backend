@@ -18,6 +18,7 @@ public class User implements Serializable {
     private String password;
     private String fullName;
     private int nDays = 10;
+    private String deviceToken;
 
     public String getId() {
         return id;
@@ -57,5 +58,13 @@ public class User implements Serializable {
 
     public void setnDays(int nDays) {
         this.nDays = nDays;
+    }
+
+    public String getDeviceToken() {
+        return deviceToken;
+    }
+
+    public void setDeviceToken(String deviceToken) {
+        this.deviceToken = deviceToken;
     }
 }

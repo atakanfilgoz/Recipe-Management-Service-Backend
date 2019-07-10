@@ -34,6 +34,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/getRecipes").permitAll()
                 .antMatchers("/getRecipe/*").permitAll()
                 .antMatchers("/searchRecipes/*").permitAll()
+                .antMatchers("/addRecipe").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))

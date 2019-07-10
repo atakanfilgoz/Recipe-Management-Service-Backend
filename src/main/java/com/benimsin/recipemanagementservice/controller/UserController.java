@@ -4,10 +4,7 @@ import com.benimsin.recipemanagementservice.model.User;
 import com.benimsin.recipemanagementservice.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserController {
@@ -31,6 +28,16 @@ public class UserController {
         User temp = userRepository.findByUsername(authentication.getName());
         temp.setnDays(user.getnDays());
         userRepository.save(temp);
+    }
+
+    @PutMapping(value = "/setToken/{deviceToken}")
+    public void setToken(@PathVariable String deviceToken,
+                         Authentication authentication){
+        String userName = authentication.getName();
+        User user = userRepository.findByUsername(userName);
+        user.setDeviceToken(deviceToken);
+
+        userRepository.save(user);
     }
 
 }

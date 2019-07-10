@@ -2,8 +2,12 @@ package com.benimsin.recipemanagementservice.controller;
 
 import com.benimsin.recipemanagementservice.model.Photo;
 import com.benimsin.recipemanagementservice.model.Recipe;
+import com.benimsin.recipemanagementservice.model.User;
 import com.benimsin.recipemanagementservice.repository.RecipeRepository;
+import com.benimsin.recipemanagementservice.repository.UserRepository;
 import com.benimsin.recipemanagementservice.service.CloudinaryService;
+import com.benimsin.recipemanagementservice.service.FCMService;
+import com.benimsin.recipemanagementservice.util.PushNotificationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +26,12 @@ public class RecipeController {
 
     @Autowired
     RecipeRepository recipeRepo;
+
+    @Autowired
+    UserRepository userRepository;
+
+    @Autowired
+    FCMService fcmService;
 
     @Autowired
     private CloudinaryService cloudinaryService;
@@ -158,6 +168,23 @@ public class RecipeController {
     @DeleteMapping("/deleteAllRecipes")
     public void deleteAllRecipes(){
         recipeRepo.deleteAll();
+    }
+
+    @GetMapping("/liked/{id}")
+    public void liked(@PathVariable String id){
+        Recipe temp = recipeRepo.findBy_id(id);
+        User user = userRepository.findByUsername(temp.getUserName());
+        PushNotificationRequest pnRequest = new PushNotificationRequest();
+        pnRequest.setMessage("Your recipe : " + temp.getName() + " is liked.");
+        pnRequest.setTitle("Likes");
+        pnRequest.setToken(user.getDeviceToken());
+        pnRequest.setTopic("");
+        try{
+            fcmService.sendMessageToToken(pnRequest);
+        }
+        catch (Exception e){
+            return;
+        }
     }
 
 }
