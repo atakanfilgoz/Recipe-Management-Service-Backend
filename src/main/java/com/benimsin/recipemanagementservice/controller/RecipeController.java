@@ -37,7 +37,7 @@ public class RecipeController {
     private CloudinaryService cloudinaryService;
 
     @PostMapping("/addRecipe")
-    public ResponseEntity<String> addRecipe(@RequestParam("name") String name,
+    public String addRecipe(@RequestParam("name") String name,
                                             @RequestParam("details") String details,
                                             @RequestParam("tags") ArrayList<String> tags,
                                             @RequestPart("file") @Valid List<MultipartFile> files,
@@ -60,10 +60,11 @@ public class RecipeController {
         }
         tempRecipe.setPhotos(photos);
         Recipe result = recipeRepo.save(tempRecipe);
-        if (result == null){
+        return tempRecipe.getId();
+        /*if (result == null){
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
-        return new ResponseEntity<>("", HttpStatus.OK);
+        return new ResponseEntity<>("", HttpStatus.OK);*/
     }
 
     @GetMapping("/getRecipes")
