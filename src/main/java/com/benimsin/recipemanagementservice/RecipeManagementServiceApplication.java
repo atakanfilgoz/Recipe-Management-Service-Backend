@@ -58,7 +58,7 @@ public class RecipeManagementServiceApplication {
         return new BCryptPasswordEncoder();
     }
 
-    @Scheduled(cron = "0 0 12 * * ?")
+    @Scheduled(cron = "0 0 * * * ?")
     public void reportCurrentTime() {
         long timeDifference;
         for (User user : userRepository.findAll()){
@@ -69,7 +69,7 @@ public class RecipeManagementServiceApplication {
                 else{
                     timeDifference = getDateDiff(new Date(),recipe.getCreatedDate(),TimeUnit.DAYS);
                 }
-                if (timeDifference < 0){
+                if (timeDifference >= user.getnDays()){
                     recipeRepository.deleteBy_id(recipe.getId());
                 }
             }
