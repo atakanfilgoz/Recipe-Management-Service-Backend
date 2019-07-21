@@ -50,14 +50,7 @@ public class RecipeController {
         if (files == null){
             return null;
         }
-        ArrayList<Photo> photos = new ArrayList<>();
-        for (MultipartFile mFile : files){
-            Map <String,String> photoInfo = cloudinaryService.uploadFile(mFile);
-            Photo photo = new Photo();
-            photo.setPhotoLink(photoInfo.get("url"));
-            photo.setPublicCloudinaryId(photoInfo.get("publicId"));
-            photos.add(photo);
-        }
+        ArrayList<Photo> photos = multiParttoList(files);
         tempRecipe.setPhotos(photos);
         Recipe result = recipeRepo.save(tempRecipe);
         return tempRecipe.getId();
@@ -100,7 +93,12 @@ public class RecipeController {
     }
 
     @PutMapping("/updateRecipe/{id}")
-    public ResponseEntity<String> updateRecipe(@PathVariable (value = "id") String _id, @RequestBody Recipe recipeRequest, Authentication authentication){
+    public ResponseEntity<String> updateRecipe(@PathVariable (value = "id") String _id,
+                                               @RequestParam("name") String name,
+                                               @RequestParam("details") String details,
+                                               @RequestParam("tags") ArrayList<String> tags,
+                                               @RequestPart("file") @Valid List<MultipartFile> files,
+                                               Authentication authentication){
         if (!recipeRepo.existsBy_id(_id)){
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
@@ -108,11 +106,13 @@ public class RecipeController {
         if (!authentication.getName().equals(temp.getUserName())){
             return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
         }
-        temp.setName(recipeRequest.getName());
-        temp.setDetails(recipeRequest.getDetails());
+        temp.setName(name);
+        temp.setDetails(details);
         temp.setUpdatedDate(new Date());
-        temp.setPhotos(recipeRequest.getPhotos());
-        temp.setTags(recipeRequest.getTags());
+        ArrayList<Photo> photos = multiParttoList(files);
+        photos.addAll(temp.getPhotos());
+        temp.setPhotos(photos);
+        temp.setTags(tags);
         recipeRepo.save(temp);
         return new ResponseEntity<>("", HttpStatus.OK);
     }
@@ -186,6 +186,18 @@ public class RecipeController {
         catch (Exception e){
             return;
         }
+    }
+
+    public ArrayList<Photo> multiParttoList(List<MultipartFile> files){
+        ArrayList<Photo> photos = new ArrayList<>();
+        for (MultipartFile mFile : files){
+            Map <String,String> photoInfo = cloudinaryService.uploadFile(mFile);
+            Photo photo = new Photo();
+            photo.setPhotoLink(photoInfo.get("url"));
+            photo.setPublicCloudinaryId(photoInfo.get("publicId"));
+            photos.add(photo);
+        }
+        return photos;
     }
 
 }
