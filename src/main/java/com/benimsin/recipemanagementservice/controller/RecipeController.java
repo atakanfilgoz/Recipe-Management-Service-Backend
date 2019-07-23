@@ -38,20 +38,27 @@ public class RecipeController {
 
     @PostMapping("/addRecipe")
     public String addRecipe(@RequestParam("name") String name,
-                                            @RequestParam("details") String details,
-                                            @RequestParam("tags") ArrayList<String> tags,
-                                            @RequestPart("file") @Valid List<MultipartFile> files,
-                                            Authentication authentication){
+                            @RequestParam("details") String details,
+                            @RequestParam("tags") ArrayList<String> tags,
+                            @RequestPart("file") @Valid List<MultipartFile> files,
+                            @RequestPart("fileIngredients") @Valid List<MultipartFile> filesIngredients,
+                            @RequestPart("fileCookingSteps") @Valid List<MultipartFile> filesCookingSteps,
+                            Authentication authentication){
+
         Recipe tempRecipe = new Recipe();
         tempRecipe.setName(name);
         tempRecipe.setDetails(details);
         tempRecipe.setTags(tags);
         tempRecipe.setUserName(authentication.getName());
-        if (files == null){
+        if (files == null || filesIngredients == null || filesCookingSteps == null){
             return null;
         }
         ArrayList<Photo> photos = multiParttoList(files);
+        ArrayList<Photo> photosIngredients = multiParttoList(filesIngredients);
+        ArrayList<Photo> photosCookingSteps = multiParttoList(filesCookingSteps);
         tempRecipe.setPhotos(photos);
+        tempRecipe.setIngredients(photosIngredients);
+        tempRecipe.setCookingSteps(photosCookingSteps);
         Recipe result = recipeRepo.save(tempRecipe);
         return tempRecipe.getId();
         /*if (result == null){
@@ -98,6 +105,8 @@ public class RecipeController {
                                                @RequestParam("details") String details,
                                                @RequestParam("tags") ArrayList<String> tags,
                                                @RequestPart("file") @Valid List<MultipartFile> files,
+                                               @RequestPart("fileIngredients") @Valid List<MultipartFile> filesIngredients,
+                                               @RequestPart("fileCookingSteps") @Valid List<MultipartFile> filesCookingSteps,
                                                Authentication authentication){
         if (!recipeRepo.existsBy_id(_id)){
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
@@ -110,8 +119,14 @@ public class RecipeController {
         temp.setDetails(details);
         temp.setUpdatedDate(new Date());
         ArrayList<Photo> photos = multiParttoList(files);
+        ArrayList<Photo> photosIngredients = multiParttoList(filesIngredients);
+        ArrayList<Photo> photosCookingSteps = multiParttoList(filesCookingSteps);
         photos.addAll(temp.getPhotos());
+        photosIngredients.addAll(photosIngredients);
+        photosCookingSteps.addAll(photosCookingSteps);
         temp.setPhotos(photos);
+        temp.setIngredients(photosIngredients);
+        temp.setCookingSteps(photosCookingSteps);
         temp.setTags(tags);
         recipeRepo.save(temp);
         return new ResponseEntity<>("", HttpStatus.OK);
@@ -155,11 +170,9 @@ public class RecipeController {
             return new ResponseEntity<>("", HttpStatus.UNAUTHORIZED);
         }
         long result = recipeRepo.deleteBy_id(id);
-        for (Photo photo : temp.getPhotos()){
-            if (photo != null){
-                cloudinaryService.deleteFile(photo.getPublicCloudinaryId());
-            }
-        }
+        deleteAllPhotos(temp.getPhotos());
+        deleteAllPhotos(temp.getIngredients());
+        deleteAllPhotos(temp.getCookingSteps());
         if (temp == null){
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
         }
@@ -198,6 +211,14 @@ public class RecipeController {
             photos.add(photo);
         }
         return photos;
+    }
+
+    public void deleteAllPhotos(List<Photo> photos){
+        for (Photo photo : photos){
+            if (photo != null){
+                cloudinaryService.deleteFile(photo.getPublicCloudinaryId());
+            }
+        }
     }
 
 }

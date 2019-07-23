@@ -16,6 +16,8 @@ public class Recipe implements Serializable {
     private String name;
     private String details;
     private List<Photo> photos = new ArrayList<>();
+    private List<Photo> ingredients = new ArrayList<>();
+    private List<Photo> cookingSteps = new ArrayList<>();
     private Date createdDate = new Date();
     private Date updatedDate;
     private ArrayList<String> tags = new ArrayList<>();
@@ -79,5 +81,21 @@ public class Recipe implements Serializable {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public List<Photo> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(List<Photo> ingredients) {
+        this.ingredients = ingredients;
+    }
+
+    public List<Photo> getCookingSteps() {
+        return cookingSteps;
+    }
+
+    public void setCookingSteps(List<Photo> cookingSteps) {
+        this.cookingSteps = cookingSteps;
     }
 }
