@@ -104,9 +104,6 @@ public class RecipeController {
                                                @RequestParam("name") String name,
                                                @RequestParam("details") String details,
                                                @RequestParam("tags") ArrayList<String> tags,
-                                               @RequestPart("file") @Valid List<MultipartFile> files,
-                                               @RequestPart("fileIngredients") @Valid List<MultipartFile> filesIngredients,
-                                               @RequestPart("fileCookingSteps") @Valid List<MultipartFile> filesCookingSteps,
                                                Authentication authentication){
         if (!recipeRepo.existsBy_id(_id)){
             return new ResponseEntity<>("", HttpStatus.NOT_FOUND);
@@ -118,15 +115,6 @@ public class RecipeController {
         temp.setName(name);
         temp.setDetails(details);
         temp.setUpdatedDate(new Date());
-        ArrayList<Photo> photos = multiParttoList(files);
-        ArrayList<Photo> photosIngredients = multiParttoList(filesIngredients);
-        ArrayList<Photo> photosCookingSteps = multiParttoList(filesCookingSteps);
-        photos.addAll(temp.getPhotos());
-        photosIngredients.addAll(photosIngredients);
-        photosCookingSteps.addAll(photosCookingSteps);
-        temp.setPhotos(photos);
-        temp.setIngredients(photosIngredients);
-        temp.setCookingSteps(photosCookingSteps);
         temp.setTags(tags);
         recipeRepo.save(temp);
         return new ResponseEntity<>("", HttpStatus.OK);
