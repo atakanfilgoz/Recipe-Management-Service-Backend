@@ -8,11 +8,11 @@ git clone github.com/atakanfilgoz/Recipe-Management-Service-Backend
 
 ### Running
 
-Explain what these tests test and why
-
 ```
 cd Recipe-Management-Service-Backend
 ```
+
+Then,
 
 ```
 gradle bootRun
